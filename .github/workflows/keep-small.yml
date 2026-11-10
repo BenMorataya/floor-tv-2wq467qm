@@ -1,0 +1,31 @@
+name: Keep the picture folder small
+# The hourly floor refresh uploads screen-1/2/3.jpg as a new commit. This folds every upload back into one commit
+# on top of the first one, so the repo never grows. It never changes this file.
+on:
+  push:
+    branches: [main]
+    paths: ['screen-*.jpg', 'status.json']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: keep-small
+  cancel-in-progress: false
+jobs:
+  squash:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fold uploads into one commit
+        run: |
+          head=$(git rev-parse HEAD)
+          root=$(git rev-list --max-parents=0 HEAD | tail -1)
+          if [ "$(git rev-list --count HEAD)" -le 2 ]; then echo "already small"; exit 0; fi
+          git config user.name 'Floor TV pictures'
+          git config user.email 'floor-tv@users.noreply.github.com'
+          git reset -q --soft "$root"
+          git commit -q -m 'Floor pictures'
+          git push -q --force-with-lease=main:"$head" origin HEAD:main || echo "main moved; the next upload will fold it"
