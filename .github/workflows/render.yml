@@ -1,0 +1,48 @@
+name: Make the TV pictures and videos
+# Turns site/index.html (the TV page) + site/data.js (team totals sent by the floor update) into the files the Roku TVs show:
+# screen-1/2/3.jpg, screen-1/2/3.mp4 (one-minute moving loops) and status.json. Runs on GitHub's free servers.
+# It runs when new numbers or a new page arrive, every hour on weekdays (so the clock-based parts stay current), or by hand.
+# Each run folds the history back to two commits, so the repo stays small.
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', 'tools/**', '.github/workflows/render.yml']
+  schedule:
+    - cron: '52 13-22 * * 1-5'   # 7:52 a.m. to 4:52 p.m. El Salvador time (UTC-6)
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: render
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fonts, ffmpeg and Playwright
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-inter fonts-noto-color-emoji ffmpeg > /dev/null
+          mkdir -p ~/.config/fontconfig && cp tools/fonts.conf ~/.config/fontconfig/fonts.conf && fc-cache -f > /dev/null
+          fc-match "Century Gothic"; fc-match "Segoe UI Emoji"
+          pip install -q playwright
+      - name: Render the 3 screens (pictures, then one-minute videos)
+        run: |
+          mkdir -p /tmp/w && cp site/index.html site/data.js /tmp/w/
+          python3 tools/render.py /tmp/w
+      - name: Publish and keep the repo small
+        run: |
+          base=$(git rev-parse HEAD)
+          cp /tmp/w/out/screen-*.jpg /tmp/w/out/status.json .
+          rm -f screen-*.mp4 && cp /tmp/w/out/screen-*.mp4 . 2>/dev/null || true
+          git config user.name 'Floor TV pictures'
+          git config user.email 'floor-tv@users.noreply.github.com'
+          git add -A screen-*.jpg screen-*.mp4 status.json
+          root=$(git rev-list --max-parents=0 HEAD | tail -1)
+          git reset -q --soft "$root"
+          git commit -q -m 'Floor TV'
+          git push -q --force-with-lease=main:"$base" origin HEAD:main || echo "main moved while rendering; the run for the newer numbers will publish"
