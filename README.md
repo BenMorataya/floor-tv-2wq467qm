@@ -4,4 +4,4 @@ Files for the Ambassador floor TVs in El Salvador.
   The floor update sends new totals twice a day on weekdays.
 - `.github/workflows/render.yml` turns them into what the Roku app shows: `screen-1/2/3.jpg`, one-minute moving loops
   `screen-1/2/3.mp4` and `status.json` (theme and light positions). It runs on new totals, hourly on weekdays, or by hand,
-  and folds the history back to two commits so the repo stays small.
+  and folds its changes into one commit so the repo stays small.

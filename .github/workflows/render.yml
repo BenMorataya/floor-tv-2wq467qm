@@ -2,7 +2,8 @@ name: Make the TV pictures and videos
 # Turns site/index.html (the TV page) + site/data.js (team totals sent by the floor update) into the files the Roku TVs show:
 # screen-1/2/3.jpg, screen-1/2/3.mp4 (one-minute moving loops) and status.json. Runs on GitHub's free servers.
 # It runs when new numbers or a new page arrive, every hour on weekdays (so the clock-based parts stay current), or by hand.
-# Each run folds the history back to two commits, so the repo stays small.
+# Each run folds its changes into one commit on top of the latest workflow change, so the repo stays small
+# (the job's token may not rewrite commits that touch .github/, so those stay in the history).
 on:
   push:
     branches: [main]
@@ -42,7 +43,7 @@ jobs:
           git config user.name 'Floor TV pictures'
           git config user.email 'floor-tv@users.noreply.github.com'
           git add -A screen-*.jpg screen-*.mp4 status.json
-          root=$(git rev-list --max-parents=0 HEAD | tail -1)
-          git reset -q --soft "$root"
+          keep=$(git log -1 --format=%H -- .github)
+          git reset -q --soft "$keep"
           git commit -q -m 'Floor TV'
           git push -q --force-with-lease=main:"$base" origin HEAD:main || echo "main moved while rendering; the run for the newer numbers will publish"
