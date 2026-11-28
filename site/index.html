@@ -1,4 +1,3 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -282,6 +281,13 @@ html[data-theme=navidad] .amb .o3{background:radial-gradient(circle,rgba(242,193
 .glist.wk strong{color:#E6F3F6;margin-left:.15rem}
 .glist.wk em{font-style:normal;color:var(--ink2);font-size:.85em;margin-left:.2rem}
 .pipe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-gap:.6rem}
+.fin3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-gap:0 .7rem;margin-top:.5rem !important}
+.fcol{min-width:0}
+.fcol .fh{font-size:.8rem;font-weight:700;letter-spacing:.02em;white-space:nowrap;overflow:hidden;color:var(--cyan);border-bottom:1px solid var(--line);padding-bottom:.1rem;margin-bottom:.2rem}
+.fcol .fi + .fi{margin-top:.3rem}
+.fcol .fl{display:block;font-size:.72rem;color:var(--ink2);line-height:1.12}
+.fcol .fv{display:block;font-family:var(--display);font-weight:700;font-size:1.1rem;color:#E6F3F6;line-height:1.2;white-space:nowrap}
+.fcol .fv small{font-family:var(--body);font-weight:400;font-size:.72rem;color:var(--ink2);margin-left:.3rem}
 .pipe .fv{font-size:1.6rem}
 @media (prefers-reduced-motion:reduce){.amb i,.tk-track,.card[data-s=ok],.in,.live:before{animation:none}.card{transition:none}}
 /* recognition with a person's name and photo (only when the person agreed) */
@@ -342,14 +348,14 @@ var DEPTS=[
   today:[{k:'liberados',label:'Expedientes liberados hoy',en:'Files cleared today',type:'count',pace:true}],
   month:[{k:'personas',label:'Personas que pusimos a trabajar',en:'People we put to work',type:'count',pace:true,hero:true},{k:'dias',label:'Días promedio para liberar',en:'Avg. days to clear',type:'num',lower:true,unit:'días'},{k:'i9',label:'I-9 correctos a la primera',en:'I-9s right the first time',type:'pct'}]},
  {id:'soporte',name:'Soporte al Empleado',en:'Employee Support',
-  today:[{k:'resueltas',label:'Solicitudes resueltas hoy',en:'Requests solved today',type:'count',pace:true},{k:'sla24',label:'Respondidas en menos de 24 h',en:'Answered within 24 h',type:'pct'}],
-  month:[{k:'sla',label:'Cumplimiento de tiempo de respuesta',en:'Response-time compliance',type:'pct'},{k:'abiertas',label:'Solicitudes abiertas',en:'Open requests',type:'count',lower:true}]},
+  today:[{k:'resueltas',label:'Casos resueltos hoy',en:'Cases solved today',type:'count',pace:true},{k:'sla24',label:'Respondidos en menos de 24 h',en:'Answered within 24 h',type:'pct'}],
+  month:[{k:'sla',label:'Cumplimiento de tiempo de respuesta',en:'Response-time compliance',type:'pct'},{k:'abiertas',label:'Casos abiertos',en:'Open cases',type:'count',lower:true}]},
  {id:'finanzas',name:'Finanzas',en:'Finance',
-  today:[{k:'facturas',label:'Facturas enviadas hoy',en:'Invoices sent today',type:'count',pace:true}],
-  month:[{k:'cobros',label:'Cobros vs. meta del mes',en:'Collections vs. goal',type:'pct',pace:true},{k:'precision',label:'Facturas sin corrección',en:'Invoices with no corrections',type:'pct'},{k:'dso',label:'Días promedio de cobro (DSO)',en:'Days sales outstanding',type:'num',lower:true,unit:'días'}]},
+  today:[{k:'items',label:'Partidas procesadas hoy',en:'Items processed today',type:'count',pace:true}],
+  month:[{k:'arU90',label:'AR · Cuentas por cobrar a menos de 90 días',en:'AR · Receivables under 90 days',type:'pct'},{k:'apOnTime',label:'AP · Facturas de proveedores antes de vencer',en:'AP · Vendor bills in before due date',type:'pct'},{k:'prIns',label:'Compras · Subcontratistas con seguro vigente',en:'Procurement · Subcontractors with valid insurance',type:'pct'}]},
  {id:'ventas',name:'Ventas',en:'Sales',
   today:[{k:'porVencer',label:'Propuestas que vencen esta semana',en:'Proposals due this week',type:'count'},{k:'proxima',label:'Próxima entrega',en:'Next deadline',type:'text'}],
-  month:[{k:'enviadas',label:'Propuestas enviadas',en:'Proposals submitted',type:'count',pace:true},{k:'puntaje',label:'Puntaje promedio de auditoría',en:'Avg. audit score',type:'num',unit:'/100'},{k:'ganadas',label:'Contratos ganados',en:'Contracts won',type:'count',pace:true}]},
+  month:[{k:'enviadas',label:'Propuestas enviadas',en:'Proposals submitted',type:'count',pace:true},{k:'ganadas',label:'Contratos adjudicados',en:'Contracts awarded',type:'count',pace:true}]},
  {id:'capacitacion',name:'Capacitación',en:'Training',
   today:[{k:'completados',label:'Cursos completados hoy',en:'Courses completed today',type:'count',pace:true}],
   month:[{k:'cursosMes',label:'Cursos este mes',en:'Courses this month',type:'count'},{k:'aldia',label:'Personal al día',en:'Staff up to date',type:'pct'},{k:'vencidas',label:'Capacitaciones vencidas',en:'Overdue trainings',type:'count',lower:true}]}
@@ -416,9 +422,9 @@ var app=document.getElementById('app');
    A team that has not reported yet shows these numbers, labeled "Sample", until its first real answer arrives.
    Never used on the Roku pictures (#foto-N). Turned off with settings.sample = false. */
 var SAMPLE={
- soporte:{targets:{sla:90,sla24:90},today:{resueltas:18,sla24:94},month:{sla:92,abiertas:7},daily:[15,21,17,19,18],hist:{pm:{sla:88,abiertas:9},ly:{sla:84,abiertas:12}}},
- finanzas:{targets:{cobros:100,precision:98},today:{facturas:42,apFact:12,apPagos:9,otj:6,arPagos:15,arSeg:11},month:{cobros:64,precision:98.6,dso:38},daily:[36,44,39,47,42],hist:{pm:{precision:97.2,dso:41},ly:{precision:96.5,dso:45}}},
- ventas:{targets:{puntaje:90},today:{porVencer:3},month:{enviadas:9,puntaje:92.5,ganadas:1},daily:[2,1,3,2,1],hist:{pm:{enviadas:22,puntaje:88,ganadas:2},ly:{enviadas:17,puntaje:85,ganadas:1}}},
+ soporte:{targets:{sla:90,sla24:90},today:{resueltas:18,sla24:94,atendidos:24,encuestas:6,auditorias:3},month:{sla:92,abiertas:7,atendidos:310,encuestas:84,auditorias:37},daily:[15,21,17,19,18],hist:{pm:{sla:88,abiertas:9},ly:{sla:84,abiertas:12}}},
+ finanzas:{targets:{items:71,arU90:99,apOnTime:95,prIns:100},today:{items:58,arFact:20,arFactW:61,arPagos:14,arPagosW:40,apFact:9,apFactW:35,apPagos:0,apPagosW:22,prJobs:8,prJobsW:25,prSol:21,prSolW:66},month:{arU90:98.7,apOnTime:93.5,prIns:96},daily:[66,74,61,79,58],hist:{pm:{arU90:98.2,apOnTime:92.1,prIns:95},ly:{}}},
+ ventas:{targets:{},today:{porVencer:3},month:{enviadas:9,ganadas:1},daily:[2,1,3,2,1],hist:{pm:{enviadas:22,ganadas:2},ly:{enviadas:17,ganadas:1}}},
  capacitacion:{targets:{aldia:95},today:{completados:14},month:{cursosMes:118,aldia:93,vencidas:4},daily:[11,16,12,15,14],hist:{pm:{cursosMes:262,aldia:91,vencidas:6},ly:{aldia:87,vencidas:9}}}
 };
 function sampleOn(){return !FOTO()&&!VIDEO()&&!(D&&D.settings&&D.settings.sample===false);}
@@ -574,7 +580,7 @@ function ring(size,frac,mark,k,val,pct,sub){
 function DX(id){return (D&&D.depts&&D.depts[id])||{};}
 function trendOf(id){if(SAMPLE[id]&&deptView(id).sample) return sampleTrend(id);var t=DX(id).trend;return t&&Array.isArray(t.bars)?t:null;}
 function wdShort(ds){var g=new Date(ds+'T12:00:00Z').getUTCDay();return tt(['dom','lun','mar','mié','jue','vie','sáb'][g],['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][g]);}
-var DAILYK={compliance:'liberados',soporte:'resueltas',finanzas:'facturas',capacitacion:'completados',ventas:null};
+var DAILYK={compliance:'liberados',soporte:'resueltas',finanzas:'items',capacitacion:'completados',ventas:null};
 function sparkSVG(id,tr,T,compact){
   var bars=tr.bars,n=nowSV().date,vals=bars.map(function(b){return b[1]}).filter(function(v){return v!=null});
   var mx=Math.max.apply(null,vals.concat([T||0,1])),W=300,top=compact?12:14,base=compact?36:50,bw=34,slot=W/bars.length,o='',ly=compact?49:64,VH=compact?52:68;
@@ -600,11 +606,20 @@ function factsRow(id,tr,T){
     if(mo.length) out.push(fact('Prom. diario','Daily avg',nf.format(Math.round(mo.reduce(function(a,c){return a+c},0)/mo.length*10)/10)));}
   return out.length?h('div',{class:'facts'},out):null;
 }
-/* Finance AR/AP team totals (from Andre's section of the daily form): counts only */
-var ARAP=[['apFact','Facturas AP','AP bills'],['apPagos','Pagos AP','AP payments'],['otj','OTJs','OTJs'],['arPagos','Pagos AR','AR payments'],['arSeg','Seguim. AR','AR follow-ups']];
+/* Finance team totals from the Finance team's NetSuite file: three equal columns, two numbers each with the week's total. Counts only */
+var ARAP=[['AR','AR',[['arFact','Facturas enviadas','Invoices sent'],['arPagos','Pagos aplicados','Payments applied']]],
+ ['AP','AP',[['apFact','Facturas registradas','Bills entered'],['apPagos','Pagos (lunes)','Payments (Mon run)']]],
+ ['Compras','Procurement',[['prJobs','Trabajos creados','Jobs set up'],['prSol','Solicitudes PO y trabajo','PO & job requests']]]];
+var ESSK=[['atendidos','Atendidos','Handled'],['encuestas','Encuestas EV','EV surveys'],['auditorias','Auditorías','Audits']];
+function essFacts(vals){
+  if(!vals||!ESSK.some(function(a){return num(vals[a[0]])!=null})) return null;
+  return h('div',{class:'facts'},ESSK.map(function(a){var v=num(vals[a[0]]);return fact(a[1],a[2],v==null?'—':nf.format(v));}));
+}
 function arapFacts(vals){
-  if(!vals||!ARAP.some(function(a){return num(vals[a[0]])!=null})) return null;
-  return h('div',{class:'facts'},ARAP.map(function(a,i){var v=num(vals[a[0]]),el=fact(a[1],a[2],v==null?'—':nf.format(v));if(i===ARAP.length-1) el.style.gridColumn='span 2';return el;}));
+  if(!vals||!ARAP.some(function(c){return c[2].some(function(a){return num(vals[a[0]])!=null})})) return null;
+  return h('div',{class:'fin3'},ARAP.map(function(c){
+    return h('div',{class:'fcol'},h('div',{class:'fh'},tt(c[0],c[1])),c[2].map(function(a){var v=num(vals[a[0]]),w=num(vals[a[0]+'W']);
+      return h('div',{class:'fi'},h('span',{class:'fl'},tt(a[1],a[2])),h('span',{class:'fv'},v==null?'—':nf.format(v),w!=null?h('small',null,nf.format(w)+' '+tt('sem.','wk')):null));}));}));
 }
 function lastKnown(tr){if(!tr) return null;for(var i=tr.bars.length-1;i>=0;i--){if(tr.bars[i][1]!=null) return tr.bars[i];}return null;}
 function monthBarsSVG(tr,T){
@@ -782,7 +797,7 @@ function deptCard1(dep){
   var sub=T!=null?tt('de ','of ')+fmtT(pm,T):(pm.k==='porVencer'?tt('esta semana','this week'):'');
   var tr=trendOf(dep.id),TD=DAILYK[dep.id]?num(dv.targets[DAILYK[dep.id]]):null,lk=(!dv.todayFresh&&pm.k===DAILYK[dep.id])?lastKnown(tr):null,ghost=false;
   if(lk){v=lk[1];frac=T?v/T:1;sub=tt('último: ','last: ')+wdShort(lk[0])+' '+shortDate(lk[0]).replace(/^\D+\s/,'');ghost=true;}
-  var xa=(dep.id==='finanzas'&&dv.todayFresh)?arapFacts(dv.today):null;
+  var xa=(dep.id==='finanzas'&&dv.todayFresh)?arapFacts(dv.today):(dep.id==='soporte'&&dv.todayFresh)?essFacts(dv.today):null;
   return h('section',{class:'card dept','data-s':st.k},
     dname(dep.id,dep.name,dep.en,dv.demo),
     h('div',{class:'ringrow'},
@@ -794,7 +809,7 @@ function deptCard1(dep){
       var rs=dv.todayFresh?evaluate(m,rv,rT,sc):{k:'pend'},RL=dl(dv,m.label,m.en);
       return h('div',{class:'sec'},h('div',null,bi(RL[0],RL[1])),h('span',{class:'secv','data-s':rs.k},dv.todayFresh?fmt(m,rv):'—',(rT!=null&&m.type!=='text'&&dv.todayFresh)?' · '+tt('meta','goal')+' '+fmtT(m,rT):''));
     }),
-    tr?sparkSVG(dep.id,tr,TD,!!(rest.length||!dv.todayFresh||xa)):null,
+    (tr&&!(dep.id==='finanzas'&&xa))?sparkSVG(dep.id,tr,TD,!!(rest.length||!dv.todayFresh||xa)):null,
     (tr&&!rest.length&&dv.todayFresh&&!xa)?factsRow(dep.id,tr,TD):null,
     (ghost||dv.sample)?null:h('div',{class:'upd'},w?tt(cap('números '+w[2]),w[3]+' numbers'):dv.updatedAt?tt('Actualizado ','Updated ')+timeOf(dv.updatedAt):tt('Sin datos todavía','No data yet')));
 }
@@ -851,8 +866,8 @@ function screen2(){
     });
     var trm=trendOf(dep.id),mb=monthBarsSVG(trm,DAILYK[dep.id]?num(d.targets[DAILYK[dep.id]]):null),lab=DEPTS.filter(function(x){return x.id===dep.id})[0].today.filter(function(m){return m.k===DAILYK[dep.id]})[0];
     var cap1=dep.id==='ventas'?['Propuestas enviadas por día','Proposals sent per day']:(lab?[lab.label.replace(/ hoy$/,'')+' por día',lab.en.replace(/ today$/,'')+' per day']:null);
-    var xm=(dep.id==='finanzas'&&d.monthFresh)?arapFacts(d.month):null;
-    return h('section',{class:'card','data-s':'info'},dname(dep.id,dep.name,dep.en,d.demo),rows,xm?[h('div',{class:'mcap'},tt('AR y AP · este mes','AR & AP · this month')),xm]:null,xm?null:mb,(!xm&&mb&&cap1)?h('div',{class:'mcap'},tt(cap1[0],cap1[1])+' · '+tt('este mes','this month')):null);
+    var xm=(dep.id==='soporte'&&d.monthFresh)?essFacts(d.month):null;
+    return h('section',{class:'card','data-s':'info'},dname(dep.id,dep.name,dep.en,d.demo),rows,xm?[h('div',{class:'mcap'},tt('Actividad del mes','This month’s activity')),xm]:null,xm?null:mb,(!xm&&mb&&cap1)?h('div',{class:'mcap'},tt(cap1[0],cap1[1])+' · '+tt('este mes','this month')):null);
   });
   var gl=[];DEPTS.forEach(function(dep){var d=deptView(dep.id);if(!d.monthFresh) return;dep.month.forEach(function(m){var mv=num(d.month[m.k]),mT=num(d.targets[m.k]);if(mv==null||mT==null) return;var s=evaluate(m,mv,mT,'month');if(s.k==='ok'||s.k==='near') gl.push({k:s.k,t:tt(dep.name,dep.en||dep.name)+' · '+tt(m.label,m.en)+' '+fmt(m,mv)});});});
   gl.sort(function(a,b){return a.k===b.k?0:(a.k==='ok'?-1:1)});
@@ -881,7 +896,7 @@ function screen2(){
         wins.length?h('ul',{class:'list'},wins.map(function(p){return h('li',null,h('span',{class:'lk'},icon('ganamos')),h('div',null,str(p.title,90),p.team?h('small',null,str(p.team,60)):null))})):(function(){var sv=deptView('ventas'),mo=sv.month||{},td=sv.today||{},items=[];
             if(mo.enviadas!=null) items.push(fact('Propuestas enviadas','Proposals sent',nf.format(mo.enviadas),h('small',null,tt('este mes','this month'))));
             if(td.porVencer!=null) items.push(fact('Vencen en 7 días','Due in 7 days',nf.format(td.porVencer)));
-            var lw=hist('ventas',monthShift(-1));if(lw&&lw.ganadas!=null) items.push(fact('Ganadas el mes pasado','Won last month',nf.format(lw.ganadas)));
+            var lw=hist('ventas',monthShift(-1));if(lw&&lw.ganadas!=null) items.push(fact('Adjudicados el mes pasado','Awarded last month',nf.format(lw.ganadas)));
             return items.length?[h('div',{class:'mlabel'},bib('Así va el camino al próximo contrato:','On the way to the next win:')),h('div',{class:'pipe'},items),td.proxima?h('div',{class:'closes'},tt('Próxima entrega: ','Next deadline: ')+td.proxima):null]
               :h('p',{class:'empty'},bib('Las victorias del mes aparecerán aquí.','This month’s wins will show up here.'));})())),
     h('div',{class:'grid g2'},panels));
@@ -1139,5 +1154,3 @@ wake();
 </script>
 </body>
 </html>
-
-</body></html>
